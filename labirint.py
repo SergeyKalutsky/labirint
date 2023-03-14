@@ -48,20 +48,29 @@ class Enemy(GameSprite):
     def __init__(self,  img_path, x, y, w, h, speed):
         super().__init__(img_path, x, y, w, h)
         self.speed = speed
-        self.down = True
+        self.direction = 'down'
     
     def update(self):
         
-        if self.down:
+        if self.direction == 'down':
             self.rect.y += self.speed
             if self.rect.y + 80 >= WIN_HEIGHT:
-                self.down = False
+                self.direction = 'up'
         
-        if not self.down:
+        if self.direction == 'up':
             self.rect.y -= self.speed
             if self.rect.colliderect(wall2):
-                self.down = True
+                self.direction = 'right'
+        
+        if self.direction == 'right':
+            self.rect.x += self.speed
+            if self.rect.x + 80 >= WIN_WIDHT:
+                self.direction = 'left'
 
+        if self.direction == 'left':
+            self.rect.x -= self.speed
+            if self.rect.colliderect(wall1):
+                self.direction = 'down'
 
 
 hero = Player('hero.png', 20, 400, 80, 80, 0, 0)
