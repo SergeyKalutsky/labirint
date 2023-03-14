@@ -44,24 +44,25 @@ class Player(GameSprite):
             if self.speed_y != 0:
                 self.rect.y -= self.speed_y
 
+
 class Enemy(GameSprite):
-    def __init__(self,  img_path, x, y, w, h, speed):
+    def __init__(self, img_path, x, y, w, h, speed):
         super().__init__(img_path, x, y, w, h)
         self.speed = speed
         self.direction = 'down'
-    
+
     def update(self):
-        
+
         if self.direction == 'down':
             self.rect.y += self.speed
             if self.rect.y + 80 >= WIN_HEIGHT:
                 self.direction = 'up'
-        
+
         if self.direction == 'up':
             self.rect.y -= self.speed
             if self.rect.colliderect(wall2):
                 self.direction = 'right'
-        
+
         if self.direction == 'right':
             self.rect.x += self.speed
             if self.rect.x + 80 >= WIN_WIDHT:
@@ -71,6 +72,21 @@ class Enemy(GameSprite):
             self.rect.x -= self.speed
             if self.rect.colliderect(wall1):
                 self.direction = 'down'
+
+
+class Bullet(GameSprite):
+    def __init__(self, x, y):
+        super().__init__('weapon.png', x, y, 25, 10)
+        self.speed = 4
+    
+    def update(self):
+        self.rect.x += self.speed
+        walls_collided = pygame.sprite.spritecollide(self, walls, False)
+        if walls_collided:
+            self.kill()
+        
+        if self.rect.x >= WIN_WIDHT:
+            self.kill()
 
 
 hero = Player('hero.png', 20, 400, 80, 80, 0, 0)
@@ -86,16 +102,21 @@ walls = pygame.sprite.Group()
 walls.add(wall1)
 walls.add(wall2)
 
+bullets = pygame.sprite.Group()
 
 state = 'game'
 run = True
 
 while run:
+    print(bullets)
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             run = False
 
         if e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_SPACE:
+                bullet = Bullet(hero.rect.x+40, hero.rect.y+40)
+                bullets.add(bullet)
             if e.key == pygame.K_LEFT:
                 hero.speed_x = -5
             if e.key == pygame.K_RIGHT:
@@ -117,6 +138,8 @@ while run:
         final.draw()
         hero.update()
         enemy.update()
+        bullets.draw(window)
+        bullets.update()
 
         if hero.rect.colliderect(final):
             state = 'win'
