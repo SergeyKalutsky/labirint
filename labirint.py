@@ -72,7 +72,13 @@ class Enemy(GameSprite):
             self.rect.x -= self.speed
             if self.rect.colliderect(wall1):
                 self.direction = 'down'
-
+        # куда
+        bullet_collided = pygame.sprite.spritecollide(self, bullets, False)
+        if bullet_collided:
+            for bullet in bullet_collided:
+                bullet.kill()
+            self.rect.x = 1000
+            self.rect.y = 1000
 
 class Bullet(GameSprite):
     def __init__(self, x, y):
@@ -108,7 +114,6 @@ state = 'game'
 run = True
 
 while run:
-    print(bullets)
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             run = False
